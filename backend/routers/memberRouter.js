@@ -9,13 +9,16 @@ const memberRouter = express.Router()
 memberRouter.get(
   '/',
   expressAsyncHandler(async (req, res) => {
+    console.log('in memberRoute.get', req.query.other_names)
+   /*  const other_names = req.query.other_names || ''
+    //const seller = req.query.seller || '';
+    const other_namesFilter = other_names
+      ? { other_names: { $regex: other_names, $options: 'i' } }
+      : {} */
+    // const sellerFilter = seller ? { seller } : {};
     const members = await Member.find({})
 
-    if (members) {
-      res.send(members)
-    } else {
-      res.status(404).send({ message: 'Members not found' })
-    }
+    res.send(members)
   }),
 )
 
@@ -103,14 +106,19 @@ memberRouter.put(
   }),
 )
 
-memberRouter.delete('/:id', isAuth, isAdmin, expressAsyncHandler(async(req, res) => {
-  const member = await Member.findById(req.params.id)
+memberRouter.delete(
+  '/:id',
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const member = await Member.findById(req.params.id)
 
-  if(member){
-    const deletedMember = await member.remove()
-    res.send({message: "Member Deleted", member: deletedMember})
-  }else{
-    res.status(404).send({message: "Member not found"})
-  }
-}))
+    if (member) {
+      const deletedMember = await member.remove()
+      res.send({ message: 'Member Deleted', member: deletedMember })
+    } else {
+      res.status(404).send({ message: 'Member not found' })
+    }
+  }),
+)
 export default memberRouter
